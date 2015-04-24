@@ -37,7 +37,6 @@
 		<Unit filename="ClimateTree.cpp" />
 		<Unit filename="ClimateTree.h" />
 		<Unit filename="FinalProject.cpp" />
-		<Unit filename="data.txt" />
 		<Extensions>
 			<code_completion />
 			<envvars />

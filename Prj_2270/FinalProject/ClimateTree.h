@@ -6,22 +6,26 @@
 
 struct climateNode{
     std::string time;
-    int temperature;
-    int precipitation;
-    int rain;
-    int snow;
-    int WindDir;
-    int WindSpeed;
-    std::string skyCover;
+    float temperature;
+    float precipitation;
+    float rain;
+    float snow;
+    float WindDir;
+    float WindSpeed;
+    float totalNodes;
+    //std::string skyCover;
     bool isRed;
     climateNode *parent;
     climateNode *right;
     climateNode *left;
 
-    climateNode(){};
+    climateNode(){
+        climateNode("",0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0, 0);
+    }
 
-    climateNode(std::string in_time, int temr, int prcp, int ran, int snw, int wdir,int wspd, std::string skyc )
+    climateNode(std::string in_time, float temr, float prcp, float ran, float snw, float wdir, float wspd, float nd)
     {
+
         time = in_time;
         temperature = temr;
         precipitation = prcp;
@@ -29,7 +33,8 @@ struct climateNode{
         snow = snw;
         WindDir = wdir;
         WindSpeed = wspd;
-        skyCover = skyc;
+        totalNodes = nd;
+        //skyCover = skyc;
 
     }
 
@@ -42,10 +47,19 @@ class ClimateTree{
         //virtual ~MovieTree();
 
         void readFile();
-        //void addMovieNode(int ranking, string title, int releaseYear, int quantity);
+        void addDayNode(std::string in_time,  float temr, float prcp, float ran, float snw, float wdir, float wspd);
+        void getHourlyClimateInfo(std::string time);
+
+        void GetAnnulSummary();
+        int getNumberOfNodes(climateNode *n);
+        void GetDailySummary(std::string day);
+        void AssingMonthNumberStr();
+        void GetMontlySummary();
+        void settotalNodeDay();
+
         //void printMovieInventory();
-        //void countMovieNodes();
-        //void deleteMovieNode(string title);
+        //void countclimateNodes();
+        //void deleteclimateNode(string title);
 
         //void findMovie(string title);
         //void rentMovie(string title);
@@ -53,27 +67,43 @@ class ClimateTree{
         //int countLongestPath();
         //use this to return the json object from the class when you are ready to write it to a file
         //json_object* getJsonObject();
-        //void rbValid();
+        void rbValid();
+        //void test();
         //bool quit(int userChoise);
     //protected:
 
     private:
-        //void rbAddFixup(MovieNode * node); // called after insert to fix tree
-        //void DeleteAll(MovieNode * node); //use this for the post-order traversal deletion of the tree
-        //void printMovieInventory(MovieNode * node, json_object * traverseLog);
+        void rbAddFixup(climateNode * node); // called after insert to fix tree
+        void leftRotate(climateNode * x);
+        void rightRotate(climateNode * x);
+        climateNode *searchClimateData(climateNode* node, std::string time);
+        void GetAnnulSummary(climateNode* node);
+        void test(climateNode *n);
+        void GetDailySummary(climateNode* node, std::string day);
+        climateNode *searchDailyData(climateNode* node, std::string day);
+        int getNumberOfHourInDay(climateNode *n, std::string day);
+        void GetMontlySummary(climateNode* node, std::string month, int arN);
 
-        //void leftRotate(MovieNode * x);
-        //void rbDelete(MovieNode * z);
-        //void rightRotate(MovieNode * x);
-        //void rbDeleteFixup(MovieNode * node);
-        //MovieNode *searchMovieTree(MovieNode *node, string title, json_object *traverseLog);
-        //MovieNode *rentMovie(MovieNode* root, string movieForRent, json_object *findLog);
-        //void deleteNode(MovieNode *cursor);
-        //void rbTransplant(MovieNode * u, MovieNode * v);
-        //int rbValid(MovieNode * node);
-        //int countMovieNodes(MovieNode *node);
-        //int countLongestPath(MovieNode *node);
-        //MovieNode *treeMin(MovieNode *root);
+
+        climateNode *DailySumary = new climateNode;
+        climateNode *AnnualSumary = new climateNode;
+        climateNode mont[12] = {};
+        float totalNodeDay = 0;
+        //void DeleteAll(climateNode * node); //use this for the post-order traversal deletion of the tree
+        //void printMovieInventory(climateNode * node, json_object * traverseLog);
+
+
+        //void rbDelete(climateNode * z);
+
+        //void rbDeleteFixup(climateNode * node);
+        //climateNode *searchMovieTree(climateNode *node, string title, json_object *traverseLog);
+        //climateNode *rentMovie(climateNode* root, string movieForRent, json_object *findLog);
+        //void deleteNode(climateNode *cursor);
+        //void rbTransplant(climateNode * u, climateNode * v);
+        int rbValid(climateNode * node);
+        //int countclimateNodes(climateNode *node);
+        //int countLongestPath(climateNode *node);
+        //climateNode *treeMin(climateNode *root);
 
         climateNode *root;
         climateNode *nil;
