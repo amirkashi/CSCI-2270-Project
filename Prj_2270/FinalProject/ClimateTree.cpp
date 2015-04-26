@@ -3,54 +3,47 @@
 #include "ClimateTree.h"
 #include <fstream>
 #include <sstream>
-
+#include <iomanip>
 
 using namespace std;
 
 ClimateTree::ClimateTree(){
     nil = new climateNode;
-    nil->parent = nil; //
+    nil->parent = nil;
     nil->right = nil;
     nil->left = nil;
     nil->isRed = false;
     root = nil;
 }
 
-//void elimnateSpace(){
-
-//}
-
 void ClimateTree::readFile(){
 
     ifstream inputFile;
     inputFile.open("DataPRT.csv");   // initiate a variable type for input file
-    //string fileDelimate1, fileDelimate2, fileDelimate3, fileDelimate4;
 
-    int lineCounter = 0;
+    int lineCounter = 0; // count number of line of the file
 
-    string strSave,token;
-    string time, timePRV, skyPrv, tempStr;
-    float wDirPrv = 0, wSpdPrv = 0, temprPrv = 0;
-    float prcpPrv = 0.0;
+    string strSave,token; // strSave saves one line , token saves column of each line like prcp
+    string time, timePRV,  tempStr; // time = time of each line, timePRV = time of previous line, temprPrv = save word on line
+    float wDirPrv = 0.0, wSpdPrv = 0.0, temprPrv = 0.0, prcpPrv = 0.0; // save climate info of previous lines
 
 
-    getline(inputFile,strSave); // ignore first line
+    getline(inputFile,strSave); // ignore first line (info names)
 
-    //int couter = 0;
-    bool wDirStr = false, wSpdStr = false, TmpStr = false;
-    float  wDirCo = 0,      wSpdCo = 0,      TmpCo = 0;
+    bool wDirStr = false, wSpdStr = false, TmpStr = false; // for checking if a value is * or not, * means no data
+    float  wDirCo = 0.0,      wSpdCo = 0.0,      TmpCo = 0.0; // count how many value we have for each time
 
     while(getline(inputFile,strSave)){
 
             istringstream ss(strSave); // ss is stream of string that help us to use get line for the line, this line is for seperating with comma
 
-            float wDir = 0, wSpd = 0, tempr = 0;
-            float prcp = 0.0;
-            string sky;
-            int colNum = 0;
+            float wDir = 0.0, wSpd = 0.0, tempr = 0.0, prcp = 0.0; // saving climate property of each line
+
+            int colNum = 0; // count number of column (data between ,) for each line
+            // getting climate info for each line
             while (getline(ss,token,',')){
 
-                if(colNum == 2){
+                if(colNum == 2){ //time
                     time = token.substr(0,10);
                 }
 
@@ -72,10 +65,7 @@ void ClimateTree::readFile(){
                         wSpdStr = false;
                     }
                 }
-                /*
-                if(colNum == 7){  // sky cover
-                    sky = token;
-                }*/
+
                 if(colNum == 21){ // temperature
                     tempStr = token;
                     if(tempStr == "****"){
@@ -95,16 +85,10 @@ void ClimateTree::readFile(){
                 }
                 colNum++;
             }
-            //cout<<"outside if"<<wDirStr<<":"<<wSpdStr<<":"<<TmpStr<<endl;
-            //cout<<wDirCo<<":"<<wSpdCo<<":"<<TmpCo<<endl;
-            //cout << time << "the stars for '" << tempStr << "'" <<wDirCo<< endl;
-            //cout<<time<<endl;
-            //cout<<time<<":"<<wDir<<":"<<wSpd<<":"<<tempr<<":"<<prcp<<endl;
+
+            // comparing time of previous line and current line
             if(timePRV == time || lineCounter == 0){
                 timePRV = time;
-                //if(time == "2012010816"){
-                  //  cout<<prcpPrv<<endl;
-               // }
 
                 if(wDirStr == false){
                     wDirPrv += wDir;
@@ -115,19 +99,13 @@ void ClimateTree::readFile(){
                     wSpdCo++;
                 }
 
-                //skyPrv = sky;
-
                 if(TmpStr == false){
                     temprPrv += tempr;
                     TmpCo++;
                 }
 
                 prcpPrv += prcp;
-                //cout<<"inside if"<<wDirStr<<":"<<wSpdStr<<":"<<TmpStr<<endl;
-                //couter++;
-                //cout<<timePRV<<":"<<wDirPrv<<":"<<wSpdPrv<<":"<<temprPrv<<":"<<prcpPrv<<endl;
-                //cout<<timePRV<<":"<<wDirPrv<<":"<<wDirCo<<":"<<wSpdPrv<<":"<<wSpdCo<<":"<<temprPrv<<":"<<TmpCo<<":"<<prcpPrv<<endl;
-                //cout<<wDirCo<<":"<<wSpdCo<<":"<<TmpCo<<endl;
+
                 wDirStr = false;
                 wSpdStr = false;
                 TmpStr = false;
@@ -144,37 +122,28 @@ void ClimateTree::readFile(){
                     TmpCo = 1;
                 }
 
-                //cout<<"hi"<<endl;
+
                 wDirPrv = wDirPrv/wDirCo;
                 wSpdPrv = wSpdPrv/wSpdCo;
                 temprPrv = temprPrv/TmpCo;
-                //cout<<wDirCo<<":"<<wSpdCo<<":"<<TmpCo<<endl;
 
-                // snow calculation
-                float snow = 0;
-                float rain = 0;
-                if(temprPrv < 32 && prcpPrv > 0){
-                    snow = prcpPrv;
-                }else{
-                    rain = prcpPrv;
-                }
+                float snow = 0.0;
+                float rain = 0.0;
+
 
                 //cout<<timePRV<<"|"<<wDirPrv<<" : "<<wDirCo<<"|"<<wSpdPrv<<" : "<<wSpdCo <<"|"<<tempr<<":"<<TmpCo<<"|"<<prcpPrv<< endl;
                 //cout<<timePRV<<":"<<wDirPrv<<":"<<wSpdPrv<<":"<<temprPrv<<":"<<prcpPrv<<endl;
                 addDayNode(timePRV, temprPrv, prcpPrv, rain, snow, wDirPrv, wSpdPrv);
                 timePRV = time;
-                //skyPrv = sky;
                 wDirPrv = wDir;
                 wSpdPrv = wSpd;
                 temprPrv = tempr;
                 prcpPrv = prcp;
-                //couter = 1;
-                //cout<<wDirCo<<":"<<wSpdCo<<":"<<TmpCo<<endl;
 
                 wDirCo = 1;
                 wSpdCo = 1;
                 TmpCo = 1;
-                //cout<<"hi"<<endl;
+
                 wDirStr = false;
                 wSpdStr = false;
                 TmpStr = false;
@@ -226,9 +195,6 @@ void ClimateTree::addDayNode(string tim, float tem, float prc, float ran, float 
         y->right = newDay;
     }
 
-
-    //cout<<newMovi->time<<endl;
-    //cout<<newMovi->parent->isRed<<endl;
     rbAddFixup(newDay);
 }
 
@@ -335,7 +301,63 @@ void ClimateTree::rightRotate(climateNode *cursor){
     y->right = x;
     x->parent = y;
 }
-// ---------------- beginning of rent movie
+
+// --------------- snow calculation
+void ClimateTree::excludeSnowRain(){
+    snowCalcYes = false;
+}
+
+void ClimateTree::setSnowRain_0(climateNode* node){
+
+    if(node == nil)
+        return;
+
+    if(node != nil){
+        node->snow = 0.0;
+        node->rain = 0.0;
+    }
+
+    if(node->left != nil){
+        setSnowRain_0(node->left);
+    }
+
+    if(node->right != nil){
+        setSnowRain_0(node->right);
+    }
+
+}
+
+
+void ClimateTree::seperateSnowRain(climateNode* node){
+
+    if(node == nil)
+        return;
+
+    if(node != nil){
+        if(node->temperature <= 32 && node->precipitation > 0.0){
+            node->snow = node->precipitation;
+        }else{
+            node->rain = node->precipitation;
+        }
+    }
+
+    if(node->left != nil){
+        seperateSnowRain(node->left);
+    }
+
+    if(node->right != nil){
+        seperateSnowRain(node->right);
+    }
+}
+
+void ClimateTree::seperateSnowRain(){
+    snowCalcYes = true;
+    setSnowRain_0(root);
+    seperateSnowRain(root);
+}
+
+
+// ---------------- hourly calculation
 
 climateNode* ClimateTree::searchClimateData(climateNode* node, string time){
 
@@ -358,35 +380,33 @@ void ClimateTree::getHourlyClimateInfo(string time){
     climateNode* findClimate= searchClimateData(root, time);
     if (findClimate!=nil){
 
-        cout<<"Climate Information for: "<<time.substr(4,2)<<"/"<<time.substr(0,4)<<"/"<<
-                time.substr(6,2)<<" at hour : "<<stoi(time.substr(8,2))<< " was: "<< endl;
-        cout<<"Temperature: "<< findClimate->temperature<<endl;
-        cout<<"Wind Direction: "<<findClimate->WindDir<<endl;
-        cout<<"Wind Speed: "<<findClimate->WindSpeed<<endl;
-        cout<<"Precipitation: "<<findClimate->precipitation<<endl;
-        cout<<"Rain: "<<findClimate->rain<<endl;
-        cout<<"Snow: "<<findClimate->snow<<endl;
+        cout<<"Climate Information for: "<<time.substr(4,2)<<"/"<<time.substr(6,2)<<"/"<<
+                time.substr(0,4)<<" at hour : "<<stoi(time.substr(8,2))<< " was "<< endl;
+        cout<<"Temperature (F): "<< setprecision(0) << fixed<<findClimate->temperature<<endl;
+        cout<<"Precipitation (in): "<<setprecision(2) << fixed<<findClimate->precipitation<<endl;
+        if(snowCalcYes == true){
+            cout<<"Rain (in): "<<setprecision(2) << fixed<<findClimate->rain<<endl;
+            cout<<"Snow (in): "<<setprecision(2) << fixed<<findClimate->snow<<endl;
+        }
+        cout<<"Wind Speed (Miles/Hour): "<<setprecision(1) << fixed<<findClimate->WindSpeed<<endl;
+        cout<<"Wind Direction (Degrees): "<<setprecision(0) << fixed<<findClimate->WindDir<<endl;
     }else{
         cout<<"The date you were looking for does not exist, please try again"<<endl;
     }
 
 }
-// -----------------------  daily
-/*
-int ClimateTree::getNumberOfHourInDay(climateNode *n, string day){
-    float total = 0;
-    if (n == nil){
-        return  0;
-    }else{
-        if(n->time.substr(0,8) == day)
-            total=1+getNumberOfNodes(n->left)+getNumberOfNodes(n->right);
-
-    }
-    return total;
-}
-*/
 void ClimateTree::settotalNodeDay(){
-    totalNodeDay = 0;
+    totalNodeCount = 0;
+}
+
+void ClimateTree:: setDailySummary_0(){
+    DailySumary->precipitation = 0.0;
+    DailySumary->temperature = 0.0;
+    DailySumary->rain = 0.0;
+    DailySumary->snow = 0.0;
+    DailySumary->WindDir = 0.0;
+    DailySumary->WindSpeed = 0.0;
+    DailySumary->totalNodes = 0.0;
 }
 
 
@@ -394,8 +414,7 @@ void ClimateTree::GetDailySummary(climateNode* node, string day){
 
     if(node == nil)
         return;
-    //float i = 0;
-    //i++;
+
     if(node != nil){
         if(node->time.substr(0,8) == day){
             DailySumary->precipitation += node->precipitation;
@@ -404,7 +423,7 @@ void ClimateTree::GetDailySummary(climateNode* node, string day){
             DailySumary->snow += node->snow;
             DailySumary->WindDir += node->WindDir;
             DailySumary->WindSpeed += node->WindSpeed;
-            totalNodeDay++;
+            totalNodeCount++;
 
         }
     }
@@ -421,37 +440,54 @@ void ClimateTree::GetDailySummary(climateNode* node, string day){
 }
 
 void ClimateTree::GetDailySummary(string day){
+    settotalNodeDay();
+    setDailySummary_0();
     GetDailySummary(root, day);
     //cout<<getNumberOfNodes(root)<<endl;
-
+    //cout<<totalNodeCount<<endl;
     cout<<"Climate Information for 2012"<<endl;
-    cout<<"Temperature: "<< (DailySumary->temperature)/totalNodeDay<<endl;
-    cout<<"Total Precipitation: "<<DailySumary->precipitation<<endl;
-    cout<<"Rain: "<<(DailySumary->rain)<<endl;
-    cout<<"Snow: "<<(DailySumary->snow)<<endl;
-    cout<<"Wind Direction: "<<(DailySumary->WindDir)/totalNodeDay<<endl;
-    cout<<"Wind Speed: "<<(DailySumary->WindSpeed)/totalNodeDay<<endl;
+    cout<<"Temperature (F): "<< setprecision(0) << fixed<<(DailySumary->temperature)/totalNodeCount<<endl;
+    cout<<"Total Precipitation (in): "<<setprecision(2) << fixed<<DailySumary->precipitation<<endl;
+    if(snowCalcYes == true){
+        cout<<"Rain (in): "<<setprecision(2) << fixed<<(DailySumary->rain)<<endl;
+        cout<<"Snow (in): "<<setprecision(2) << fixed<<(DailySumary->snow)<<endl;
+    }
+    cout<<"Wind Speed (Miles/Hour): "<<setprecision(1) << fixed<<(DailySumary->WindSpeed)/totalNodeCount<<endl;
+    cout<<"Wind Direction (Degrees): "<<setprecision(0) << fixed<<(DailySumary->WindDir)/totalNodeCount<<endl;
+
     //cout<<"total "<<DailySumary->totalNodes<<endl;
 }
 // -------------------------         Monthly
+void ClimateTree::setMontlySumarry_0(){
+    for(int i = 0; i < 12; i++){
+        mont[i].precipitation = 0.0;
+        mont[i].temperature = 0.0;
+        mont[i].rain = 0.0;
+        mont[i].snow = 0.0;
+        mont[i].WindDir = 0.0;
+        mont[i].WindSpeed = 0.0;
+        mont[i].totalNodes = 0.0;
+    }
+}
+
 void ClimateTree::AssingMonthNumberStr(){
     string monthStr[12] = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
     for(int i = 0; i < 12; i++){
         mont[i].time = monthStr[i];
     }
-
 }
 
 
 void ClimateTree::GetMontlySummary(climateNode* node, string month, int arN){
 
-
+        //cout<<"Before If ;  "<<month<<" = "<<arN<<endl;
         if(node == nil)
             return;
 
         if(node != nil){
         //cout<<node->time.substr(4,2)<<"       "<<mont[arN].time<<endl;
-            if(node->time.substr(4,2) == mont[arN].time){
+            if(node->time.substr(4,2) == month){
+
 
                 mont[arN].precipitation += node->precipitation;
                 mont[arN].temperature += node->temperature;
@@ -459,8 +495,11 @@ void ClimateTree::GetMontlySummary(climateNode* node, string month, int arN){
                 mont[arN].snow += node->snow;
                 mont[arN].WindDir += node->WindDir;
                 mont[arN].WindSpeed += node->WindSpeed;
-
+                mont[arN].totalNodes = ++totalNodeCount;
+                //cout<<mont[arN].time<<"    "<<arN<<"    "<<node->precipitation<<endl;
+                //cout<<node->time.substr(4,2)<<" "<<month<<endl;
             }
+
         }
 
         if(node->left != nil){
@@ -475,30 +514,83 @@ void ClimateTree::GetMontlySummary(climateNode* node, string month, int arN){
 
 void ClimateTree::GetMontlySummary(){
     AssingMonthNumberStr();
+    setMontlySumarry_0();
 
+    settotalNodeDay();
     for(int arN = 0; arN < 12; arN++){
 
         GetMontlySummary(root, mont[arN].time, arN);
-    }
+        settotalNodeDay();
 
+    }
+    cout<<endl;
+    cout<<"|Month\t\t\t\t\t";
+    cout<<"| "<<"Jan\t"<<"| "<<"feb\t"<<"| "<<"Mar\t"
+        <<"| "<<"Apr\t"<<"| "<<"May\t"<<"| "<<"Jun\t"
+        <<"| "<<"Jul\t"<<"| "<<"Aug\t"<<"| "<<"Sep\t"
+        <<"| "<<"Oct\t"<<"| "<<"Nov\t"<<"| "<<"Dec\t"<<"|"<<endl;
+
+    cout<<"|Average Temperature (F)\t\t";
     for(int j = 0; j<12; j++){
-        cout<<mont[j].temperature<<endl;
-    }
-/*
+        cout<<"| "<<setprecision(0) << fixed<<(mont[j].temperature/mont[j].totalNodes)<<"\t";
 
-    float tot = 24.0;
-    cout<<"Climate Information for JAN"<<endl;
-    cout<<"Temperature: "<<mont[0]<<endl;
-    cout<<"Total Precipitation: "<<DailySumary->precipitation<<endl;
-    cout<<"Rain: "<<(DailySumary->rain)<<endl;
-    cout<<"Snow: "<<(DailySumary->snow)<<endl;
-    cout<<"Wind Direction: "<<(DailySumary->WindDir)/tot<<endl;
-    cout<<"Wind Speed: "<<(DailySumary->WindSpeed)/tot<<endl;
-    //cout<<"total "<<DailySumary->totalNodes<<endl;*/
+    }
+    cout<<"|"<<endl;
+
+    cout<<"|Total Precipitation (in)\t\t";
+    for(int j = 0; j<12; j++){
+        cout<<"| "<<setprecision(2) << fixed <<mont[j].precipitation<<"\t";
+
+    }
+    cout<<"|"<<endl;
+
+    if(snowCalcYes == true){
+        cout<<"|Total rain (in)\t\t\t";
+        for(int j = 0; j<12; j++){
+            cout<<"| "<<setprecision(2) << fixed <<mont[j].rain<<"\t";
+        }
+        cout<<"|"<<endl;
+
+        cout<<"|Total Snow (in)\t\t\t";
+        for(int j = 0; j<12; j++){
+            cout<<"| "<<setprecision(2) << fixed <<mont[j].snow<<"\t";
+        }
+        cout<<"|"<<endl;
+    }
+
+
+    cout<<"|Average Wind Speed (Mile/Hour)\t\t";
+    for(int j = 0; j<12; j++){
+        cout<<"| "<<setprecision(1) << fixed << (mont[j].WindSpeed/mont[j].totalNodes)<<"\t";
+
+    }
+    cout<<"|"<<endl;
+
+
+    cout<<"|Average Wind Direction (Degrees)\t";
+    for(int j = 0; j<12; j++){
+        cout<<"| "<<setprecision(0) << fixed<<(mont[j].WindDir/mont[j].totalNodes)<<"\t";
+
+    }
+    cout<<"|"<<endl;
+    cout<<endl;
+
 }
 
 
 // -------------------------         annual
+void ClimateTree::setAnnualSummary_0(){
+
+    AnnualSumary->precipitation = 0.0;
+    AnnualSumary->temperature = 0.0;
+    AnnualSumary->rain = 0.0;
+    AnnualSumary->snow = 0.0;
+    AnnualSumary->WindDir = 0.0;
+    AnnualSumary->WindSpeed = 0.0;
+    AnnualSumary->totalNodes = 0.0;
+
+}
+
 int ClimateTree::getNumberOfNodes(climateNode *n){
     int total = 0;
     if (n == nil){
@@ -521,6 +613,7 @@ void ClimateTree::GetAnnulSummary(climateNode* node){
         AnnualSumary->precipitation += node->precipitation;
         AnnualSumary->temperature += node->temperature;
         AnnualSumary->rain += node->rain;
+        AnnualSumary->snow += node->snow;
         AnnualSumary->WindDir += node->WindDir;
         AnnualSumary->WindSpeed += node->WindSpeed;
     }
@@ -538,16 +631,20 @@ void ClimateTree::GetAnnulSummary(climateNode* node){
 }
 
 void ClimateTree::GetAnnulSummary(){
+    setAnnualSummary_0();
     GetAnnulSummary(root);
     //cout<<getNumberOfNodes(root)<<endl;
     float tot = getNumberOfNodes(root);
     cout<<"Climate Information for 2012"<<endl;
-    cout<<"Temperature: "<< (AnnualSumary->temperature)/tot<<endl;
-    cout<<"Total Precipitation: "<<AnnualSumary->precipitation<<endl;
-    cout<<"Rain: "<<(AnnualSumary->rain)<<endl;
-    cout<<"Snow: "<<(AnnualSumary->snow)<<endl;
-    cout<<"Wind Direction: "<<(AnnualSumary->WindDir)/tot<<endl;
-    cout<<"Wind Speed: "<<(AnnualSumary->WindSpeed)/tot<<endl;
+    cout<<"Average Temperature (F): "<<setprecision(0) << fixed<<(AnnualSumary->temperature)/tot<<endl;
+    cout<<"Total Precipitation (in): "<<setprecision(2) << fixed<<AnnualSumary->precipitation<<endl;
+    if(snowCalcYes == true){
+        cout<<"Rain (in): "<<setprecision(2) << fixed<<(AnnualSumary->rain)<<endl;
+        cout<<"Snow (in): "<<setprecision(2) << fixed<<(AnnualSumary->snow)<<endl;
+    }
+    cout<<"Wind Speed (Mile/Hour): "<<setprecision(1) << fixed<<(AnnualSumary->WindSpeed)/tot<<endl;
+    cout<<"Wind Direction (Degrees): "<<setprecision(0) << fixed<<(AnnualSumary->WindDir)/tot<<endl;
+
 
 
 }
