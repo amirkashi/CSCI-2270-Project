@@ -7,7 +7,7 @@ For this project we obtained the 2012 climatological data for Boulder Municipal 
 
 ### Program implementation:
 Boulder Municipal Airport station records climate data three times per hour. The data we got for 2012 had 25,370 data. Due to the immense amount of data points, we decided to read in the data by the hour. To further explain, each node contained data information for each hour. This led each node to contain 3 data points. Since we inserted the data according to the recorded time, the format of the time was presented in the following order 2012MMDDHHMM.
-The data points were inserted into a *red-black tree*. The reason we used a red-black tree was because our data was sequential. This would create a linked list which would increase run time and decrease efficiency. 
+The data points were inserted into a **red-black tree**. The reason we used a red-black tree was because our data was sequential. This would create a linked list which would increase run time and decrease efficiency. 
 
 ### Instructions:
 1) Click on the following link: https://github.com/amirkashi/test.git
