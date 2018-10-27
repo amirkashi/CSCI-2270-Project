@@ -1,5 +1,5 @@
-/bin/*
-/obj/*
+bin
+obj
 Final Project.cbp
 Final Project.depend
 Final Project.layout
